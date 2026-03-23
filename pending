@@ -95,7 +95,7 @@ input:focus,select:focus,textarea:focus{border-color:#1A95BC;box-shadow:0 0 0 3p
             <option>Utkarsh</option><option>Vikash</option><option>Aditya</option>
             <option>Nitin</option><option>Amit</option><option>Himali</option>
             <option>Gaurav</option>
-            <option value="A">BD – A</option><option value="B">BD – B</option><option value="C">BD – C</option>
+            <option value="A">BD – A</option><option value="Satish">Satish</option><option value="Jofin">Jofin</option>
           </optgroup>
         </select>
       </div>
@@ -178,7 +178,7 @@ input:focus,select:focus,textarea:focus{border-color:#1A95BC;box-shadow:0 0 0 3p
   </div>
   <div id="lc-bd" class="px-6 py-4 hidden">
     <div class="card overflow-x-auto">
-      <table><thead><tr><th>#</th><th>BD</th><th>FY Target (₹)</th><th>Revenue (₹)</th><th>GP (₹)</th><th>GQ%</th><th>Attainment</th><th>vs Target</th><th>Status</th></tr></thead>
+      <table><thead><tr><th>#</th><th>BD</th><th>FY Target (₹)</th><th>Revenue (₹)</th><th>GP (₹)</th><th>GP%</th><th>Attainment</th><th>vs Target</th><th>Status</th></tr></thead>
       <tbody id="lBdB"></tbody></table>
     </div>
   </div>
@@ -271,19 +271,19 @@ const PH={
   'Arnab':      'd360c1fbd916496f6f58be4a717ce642195a5a5a4da26a353d446f736f6a1b02',
   'Anand':      'cf8106179c5fd009a4876785e0b8079475602ded52689bb1b7abbaba9ce1e4bb',
   'Sayed':      '6fe493c941b6d3897f599cbd24912ceb173a22ecc049dbd262f5da5c6055bdc6',
-  'Utkarsh':      '8da896372027b0c96328c62e3183c7eb1649e5e0e9f21791eb1c64eba206e29e',
-  'Vikash':      '7d2e4170c9a0f70c0dd86a8a683044d0b1a1e1ba37a585a4a5fe9011adb0b1c4',
-  'Aditya':      '25bba6270a7473ca02695f290b7c11cdce45a0443c0125dab69b30873218da7d',
-  'Nitin':       'bf5750fcf956a0cad4cc0e27bdb5cdcb29aefc296efdef47cc15648ec8cc909d',
-  'Amit':        '3631dc6bc817e9907fbc21316a81d2aa998327bde37900e774a45b6f353d9c73',
-  'Himali':      '3f6fe23c991aa42ee5943e22a0801eab4fa3b018d9e719e113cea24d4ea57204',
-  'Gaurav':      '45e9f120a5f9c719408935ff565b920a39b63471fdaff0b5cd5a3119ba02955e',
-  'A':           '58dfaa852c58f3b7e078b3f4554f1b7681b7e56bc53484ef5286fb81e5998d7a',
-  'B':           '125e845e9b16ad8351972806d701ed13b3fdac462236df23b1b587d13158f9cc',
-  'C':           '392f39e89859f34e2d019053db9cfc81e693507eb3f0792ef9ae4f9a3c0f34b4',
-  'leadership':  '545ed917648dbfcbbb5b2a51a5bb0f7ac505b3d751e86be4a6c89e3b430396fb'
+  'Utkarsh':    '8da896372027b0c96328c62e3183c7eb1649e5e0e9f21791eb1c64eba206e29e',
+  'Vikash':     '7d2e4170c9a0f70c0dd86a8a683044d0b1a1e1ba37a585a4a5fe9011adb0b1c4',
+  'Aditya':     '25bba6270a7473ca02695f290b7c11cdce45a0443c0125dab69b30873218da7d',
+  'Nitin':      'bf5750fcf956a0cad4cc0e27bdb5cdcb29aefc296efdef47cc15648ec8cc909d',
+  'Amit':       '3631dc6bc817e9907fbc21316a81d2aa998327bde37900e774a45b6f353d9c73',
+  'Himali':     '3f6fe23c991aa42ee5943e22a0801eab4fa3b018d9e719e113cea24d4ea57204',
+  'Gaurav':     '45e9f120a5f9c719408935ff565b920a39b63471fdaff0b5cd5a3119ba02955e',
+  'A':          '58dfaa852c58f3b7e078b3f4554f1b7681b7e56bc53484ef5286fb81e5998d7a',
+  'Satish':     '125e845e9b16ad8351972806d701ed13b3fdac462236df23b1b587d13158f9cc',
+  'Jofin':      '392f39e89859f34e2d019053db9cfc81e693507eb3f0792ef9ae4f9a3c0f34b4',
+  'leadership': '545ed917648dbfcbbb5b2a51a5bb0f7ac505b3d751e86be4a6c89e3b430396fb'
 };
-const BDS=['Arnab','Anand','Sayed','Utkarsh','Vikash','Aditya','Nitin','Amit','Himali','Gaurav','A','B','C'];
+const BDS=['Arnab','Anand','Sayed','Utkarsh','Vikash','Aditya','Nitin','Amit','Himali','Gaurav','A','Satish','Jofin'];
 const FYM=['Apr-25','May-25','Jun-25','Jul-25','Aug-25','Sep-25','Oct-25','Nov-25','Dec-25','Jan-26','Feb-26','Mar-26'];
 const TGT=10000000;
 const VC=['#0F5577','#1A95BC','#AD332D','#F69320','#22c55e','#a855f7','#06b6d4','#f97316','#14b8a6','#8b5cf6','#ec4899','#84cc16','#6366f1'];
@@ -354,7 +354,7 @@ function onSel(){
   if(!n){['wMsg','pSec','lBtn'].forEach(id=>document.getElementById(id).classList.add('hidden'));return;}
   ['wMsg','pSec','lBtn'].forEach(id=>document.getElementById(id).classList.remove('hidden'));
   document.getElementById('lPin').value='';
-  const dn=n==='A'?'BD – A':n==='B'?'BD – B':n==='C'?'BD – C':n;
+  const dn=n==='A'?'BD – A':n;
   if(n==='leadership'){
     document.getElementById('wGr').textContent='👑 Welcome, Leadership!';
     document.getElementById('wIn').innerHTML='<p>You have access to the <strong>consolidated view</strong> of all 13 BDs including team KPIs, BD-wise performance with attainment, monthly trend, and top clients.</p><p class="mt-1" style="color:#AD332D;font-weight:600">Enter your Leadership PIN to continue.</p>';
@@ -397,7 +397,7 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
 function toast(m){const t=document.getElementById('tst');t.textContent=m;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),2800);}
 
 function initBd(){
-  const dn=cu==='A'?'BD – A':cu==='B'?'BD – B':cu==='C'?'BD – C':cu;
+  const dn=cu==='A'?'BD – A':cu;
   document.getElementById('bdHN').textContent=dn;
   rKpi();rTbl();
 }
