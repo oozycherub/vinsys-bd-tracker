@@ -1010,7 +1010,7 @@ function openEditBD(name){
 function closeBDMod(){document.getElementById('bdMod').classList.add('hidden');}
 document.getElementById('bdMod').addEventListener('click',e=>{if(e.target===document.getElementById('bdMod'))closeBDMod();});
 
-async function saveBDMe~(e){
+async function saveBDMod(e){
   e.preventDefault();
   const origName=document.getElementById('bdEditOrig').value;
   const isNew=!origName;
