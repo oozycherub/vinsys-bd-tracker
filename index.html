@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BD Performance Tracker | Vinsys</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>tailwind.config={darkMode:['class','[data-theme="dark"]'],theme:{extend:{colors:{vred:'#AD332D',vorange:'#F69320',vblue:'#0F5577',vcyan:'#1A95BC'},fontFamily:{orbitron:['Orbitron','sans-serif'],poppins:['Poppins','sans-serif']}}}}</script>
+<style>
+*{font-family:'Poppins',sans-serif;box-sizing:border-box;margin:0;padding:0}
+h1,h2,.orb{font-family:'Orbitron',sans-serif}
+[data-theme="light"]{--bg:#f0f4f8;--sf:#fff;--sf2:#f8faff;--bd:#e2e8f0;--tx:#1a202c;--tx2:#4a5568;--tx3:#718096;--sh:0 2px 16px rgba(0,0,0,.08)}
+[data-theme="dark"]{--bg:#0a0f1a;--sf:#111827;--sf2:#1a2234;--bd:#2d3748;--tx:#f7fafc;--tx2:#cbd5e0;--tx3:#718096;--sh:0 2px 16px rgba(0,0,0,.4)}
+body{background:var(--bg);color:var(--tx);transition:background .3s,color .3s}
+.vg{background:linear-gradient(135deg,#AD332D 0%,#0F5577 55%,#1A95BC 100%)}
+.vgh{background:linear-gradient(90deg,#0F5577 0%,#1A95BC 55%,#AD332D 100%)}
+.card{background:var(--sf);border-radius:14px;box-shadow:var(--sh);border:1px solid var(--bd);transition:background .3s,border .3s}
+.kpi{padding:20px 22px;border-radius:14px;box-shadow:var(--sh);background:var(--sf);border-top:4px solid;transition:.3s}
+.kb{border-top-color:#0F5577}.kc{border-top-color:#1A95BC}.ko{border-top-color:#F69320}.kr{border-top-color:#AD332D}.kg{border-top-color:#22c55e}
+table{border-collapse:collapse;width:100%}
+th{background:#0F5577;color:#fff;padding:11px 13px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+td{padding:9px 13px;font-size:13px;border-bottom:1px solid var(--bd);white-space:nowrap;color:var(--tx)}
+tr:nth-child(even) td{background:var(--sf2)}
+tr:hover td{background:rgba(15,85,119,.07)}
+[data-theme="dark"] th{background:#1A95BC}
+.gg{background:#dcfce7;color:#166534;font-weight:700;border-radius:20px;padding:3px 10px;font-size:12px}
+.gy{background:#fef9c3;color:#854d0e;font-weight:700;border-radius:20px;padding:3px 10px;font-size:12px}
+.gr{background:#fee2e2;color:#991b1b;font-weight:700;border-radius:20px;padding:3px 10px;font-size:12px}
+[data-theme="dark"] .gg{background:#14532d;color:#86efac}
+[data-theme="dark"] .gy{background:#422006;color:#fde68a}
+[data-theme="dark"] .gr{background:#450a0a;color:#fca5a5}
+.sa{background:#dbeafe;color:#1e40af;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600}
+.sc{background:#d1fae5;color:#065f46;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600}
+.sp{background:#fef3c7;color:#92400e;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600}
+input,select,textarea{border:1px solid var(--bd);border-radius:8px;padding:10px 13px;font-size:14px;font-family:'Poppins',sans-serif;width:100%;outline:none;background:var(--sf);color:var(--tx);transition:.2s}
+input:focus,select:focus,textarea:focus{border-color:#1A95BC;box-shadow:0 0 0 3px rgba(26,149,188,.18)}
+input:disabled,select:disabled{opacity:.6;cursor:not-allowed}
+.btn{background:linear-gradient(135deg,#0F5577,#1A95BC);color:#fff;border:none;padding:11px 26px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;transition:.2s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(15,85,119,.35)}
+.btno{background:linear-gradient(135deg,#c2410c,#F69320);color:#fff;border:none;padding:11px 26px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;transition:.2s}
+.btno:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(246,147,32,.35)}
+.bdel{background:#AD332D;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer}
+.bsm{background:#1A95BC;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer}
+.bgrn{background:#22c55e;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer}
+.tab{padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:2px solid transparent;transition:.2s;font-family:'Poppins',sans-serif}
+.tab.on{background:#0F5577;color:#fff}
+.tab:not(.on){background:var(--sf);color:#0F5577;border-color:#0F5577}
+.tab:not(.on):hover{background:rgba(15,85,119,.08)}
+[data-theme="dark"] .tab:not(.on){color:#1A95BC;border-color:#1A95BC}
+.atab{padding:7px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid transparent;transition:.2s;font-family:'Poppins',sans-serif}
+.atab.on{background:#F69320;color:#fff}
+.atab:not(.on){background:var(--sf);color:#F69320;border-color:#F69320}
+.atab:not(.on):hover{background:rgba(246,147,32,.08)}
+.mov{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:1000}
+.mod{background:var(--sf);border-radius:18px;padding:34px;width:92%;max-width:580px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.25)}
+.tt{width:44px;height:24px;background:#cbd5e0;border-radius:12px;position:relative;cursor:pointer;transition:.3s;flex-shrink:0}
+[data-theme="dark"] .tt{background:#1A95BC}
+.tk{width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+[data-theme="dark"] .tk{left:23px}
+.ab{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;width:90px;display:inline-block;vertical-align:middle;margin-left:6px}
+.af{height:100%;border-radius:4px;transition:width .4s}
+.toast{position:fixed;bottom:28px;right:28px;background:#0F5577;color:#fff;padding:14px 22px;border-radius:10px;font-size:14px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.25);animation:su .3s ease}
+@keyframes su{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+.qc{border-left:4px solid #F69320;background:rgba(246,147,32,.08);padding:16px 20px;border-radius:0 10px 10px 0;margin-bottom:20px}
+[data-theme="dark"] .qc{background:rgba(246,147,32,.05)}
+.wc{border:2px solid #1A95BC;background:rgba(26,149,188,.06);padding:18px 22px;border-radius:12px;animation:fi .4s ease}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--sf2)}::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:3px}
+.fh{font-size:11px;color:var(--tx3);margin-top:3px;padding-left:2px}
+.admc{background:var(--sf2);border:1px solid var(--bd);border-radius:12px;padding:18px 22px;margin-bottom:12px;transition:background .3s,border .3s}
+.admc:hover{border-color:#1A95BC}
+.tip{background:rgba(246,147,32,.08);border:1px solid rgba(246,147,32,.3);border-radius:10px;padding:14px 18px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LOGIN PAGE
+══════════════════════════════════════════════════════════════ -->
+<div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-lg">
+    <div class="vg rounded-2xl p-8 text-white text-center mb-5 shadow-2xl">
+      <div class="orb text-xs tracking-widest mb-2" style="color:#F69320">VINSYS INTERNATIONAL</div>
+      <div class="orb text-2xl font-bold tracking-wide">BD PERFORMANCE</div>
+      <div class="orb text-2xl font-bold tracking-wide" style="color:#1A95BC">TRACKER</div>
+      <p class="mt-2 text-sm" style="color:rgba(255,255,255,.7)">Multi-Year · Team Intelligence · Strategic Insights</p>
+    </div>
+    <div class="flex justify-end mb-3 pr-1 items-center gap-2 text-sm" style="color:var(--tx3)">
+      <span>☀️</span><div class="tt" onclick="toggleTheme()"><div class="tk"></div></div><span>🌙</span>
+    </div>
+    <div class="qc mb-4">
+      <p class="text-sm italic" style="color:var(--tx2)" id="qT"></p>
+      <p class="text-xs font-semibold mt-2" style="color:#F69320" id="qA"></p>
+    </div>
+    <div class="card p-8">
+      <div class="orb text-base font-bold mb-6" style="color:#0F5577">SIGN IN</div>
+      <div class="mb-4">
+        <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">Fiscal Year</label>
+        <select id="lFY" onchange="onFYSel()"></select>
+        <p class="fh">Select the fiscal year you want to access.</p>
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">Select Your Name</label>
+        <select id="lName" onchange="onSel()">
+          <option value="">— Select your name —</option>
+        </select>
+      </div>
+      <div id="wMsg" class="wc mb-4 hidden">
+        <p class="font-semibold text-sm mb-2" style="color:#0F5577" id="wGr"></p>
+        <div id="wIn" class="text-xs space-y-1" style="color:var(--tx2)"></div>
+      </div>
+      <div id="pSec" class="mb-5 hidden">
+        <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">Enter Your PIN</label>
+        <input type="password" id="lPin" placeholder="••••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+        <p id="lErr" class="text-red-500 text-xs mt-2 hidden">Incorrect PIN. Please try again.</p>
+      </div>
+      <button id="lBtn" onclick="doLogin()" class="btn w-full py-3 text-base rounded-xl hidden">Enter Dashboard →</button>
+    </div>
+    <p class="text-center text-xs mt-4" style="color:var(--tx3)">🔒 SHA-256 encrypted · Vinsys Confidential</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     BD APP
+══════════════════════════════════════════════════════════════ -->
+<div id="bdApp" class="hidden min-h-screen">
+  <div class="vgh text-white px-6 py-4 flex items-center justify-between shadow-lg">
+    <div>
+      <div class="orb text-xs tracking-widest mb-0.5" style="color:#1A95BC">VINSYS BD TRACKER</div>
+      <div class="orb text-lg font-bold tracking-wide">
+        <span id="bdHN" style="color:#F69320"></span><span class="font-light text-white"> — My Dashboard</span>
+      </div>
+      <p id="bdFYLabel" class="text-xs mt-0.5" style="color:rgba(255,255,255,.6)"></p>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="tt" onclick="toggleTheme()"><div class="tk"></div></div>
+      <button onclick="openD()" class="btn text-sm px-5 py-2">+ Add Deal</button>
+      <button onclick="logout()" class="text-sm underline" style="color:#1A95BC;background:none;border:none;cursor:pointer">Sign Out</button>
+    </div>
+  </div>
+  <div class="px-6 py-3 flex gap-3 border-b" style="background:var(--sf);border-color:var(--bd)">
+    <button onclick="showT('d')" class="tab on" id="tb-d">📋 My Deals</button>
+    <button onclick="showT('t')" class="tab" id="tb-t">📈 Monthly Trend</button>
+  </div>
+  <div class="px-6 pt-5 pb-2 grid grid-cols-2 md:grid-cols-4 gap-4" id="bKpi"></div>
+  <div id="tc-d" class="px-6 py-4">
+    <div class="card overflow-x-auto">
+      <table><thead><tr>
+        <th>#</th><th>Client</th><th>Type</th><th>Start</th><th>End</th><th>Month</th>
+        <th>Revenue (₹)</th><th>Cost (₹)</th><th>GP (₹)</th><th>GP%</th><th>Status</th><th>Remarks</th><th></th>
+      </tr></thead><tbody id="bTB"><tr><td colspan="13" class="text-center py-12" style="color:var(--tx3)">No deals yet — click <strong>+ Add Deal</strong> to begin.</td></tr></tbody></table>
+    </div>
+  </div>
+  <div id="tc-t" class="px-6 py-4 hidden">
+    <div class="card p-6">
+      <div class="orb text-xs font-bold mb-4" style="color:#0F5577" id="bdChTitle">MY MONTHLY REVENUE &amp; GP</div>
+      <canvas id="bCh" height="100"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LEADERSHIP APP
+══════════════════════════════════════════════════════════════ -->
+<div id="ldApp" class="hidden min-h-screen">
+  <div class="vg text-white px-6 py-4 flex items-center justify-between shadow-lg flex-wrap gap-3">
+    <div>
+      <div class="orb text-xs tracking-widest mb-0.5" style="color:#F69320">VINSYS INTERNATIONAL</div>
+      <div class="orb text-lg font-bold tracking-wide">LEADERSHIP DASHBOARD</div>
+      <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.6)">BD Team · Confidential</p>
+    </div>
+    <div class="flex items-center gap-3 flex-wrap justify-end">
+      <div>
+        <p class="text-xs mb-1" style="color:rgba(255,255,255,.5)">FISCAL YEAR</p>
+        <select id="ldFY" onchange="onLdFYChange()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;width:auto"></select>
+      </div>
+      <div class="tt" onclick="toggleTheme()"><div class="tk"></div></div>
+      <button onclick="logout()" class="text-sm underline" style="color:#1A95BC;background:none;border:none;cursor:pointer">Sign Out</button>
+    </div>
+  </div>
+  <div class="px-6 py-3 flex gap-3 flex-wrap border-b" style="background:var(--sf);border-color:var(--bd)">
+    <button onclick="showL('ov')" class="tab on" id="lt-ov">🏠 Overview</button>
+    <button onclick="showL('bd')" class="tab" id="lt-bd">👥 BD Performance</button>
+    <button onclick="showL('tr')" class="tab" id="lt-tr">📈 Monthly Trend</button>
+    <button onclick="showL('cl')" class="tab" id="lt-cl">🏆 Top Clients</button>
+    <button onclick="showL('admin')" class="tab" id="lt-admin">⚙️ Admin</button>
+  </div>
+  <div class="px-6 pt-5 pb-2 grid grid-cols-2 md:grid-cols-5 gap-4" id="lKpi"></div>
+
+  <!-- Overview -->
+  <div id="lc-ov" class="px-6 py-4">
+    <div class="grid md:grid-cols-2 gap-5">
+      <div class="card p-6"><div class="orb text-xs font-bold mb-4" style="color:#0F5577">REVENUE BY BD (₹)</div><canvas id="lRv" height="200"></canvas></div>
+      <div class="card p-6"><div class="orb text-xs font-bold mb-4" style="color:#0F5577">GP% BY BD</div><canvas id="lGp" height="200"></canvas></div>
+    </div>
+  </div>
+
+  <!-- BD Performance -->
+  <div id="lc-bd" class="px-6 py-4 hidden">
+    <div class="card overflow-x-auto">
+      <table><thead><tr>
+        <th>#</th><th>BD</th><th>FY Target (₹)</th><th>Revenue (₹)</th><th>GP (₹)</th><th>GP%</th><th>Attainment</th><th>vs Target</th><th>Status</th>
+      </tr></thead>
+      <tbody id="lBdB"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Monthly Trend -->
+  <div id="lc-tr" class="px-6 py-4 hidden">
+    <div class="card p-6">
+      <div class="orb text-xs font-bold mb-4" style="color:#0F5577" id="lTrTitle">TEAM REVENUE — MONTH ON MONTH (₹)</div>
+      <canvas id="lTr" height="100"></canvas>
+    </div>
+  </div>
+
+  <!-- Top Clients -->
+  <div id="lc-cl" class="px-6 py-4 hidden">
+    <div class="card overflow-x-auto">
+      <div class="p-5 border-b" style="border-color:var(--bd)"><div class="orb text-xs font-bold" style="color:#0F5577">TOP CLIENTS BY REVENUE (₹)</div></div>
+      <table><thead><tr><th>#</th><th>Client</th><th>BD</th><th>Type</th><th>Revenue (₹)</th><th>GP (₹)</th><th>GP%</th></tr></thead>
+      <tbody id="lClB"></tbody></table>
+    </div>
+  </div>
+
+  <!-- ⚙️ Admin Panel -->
+  <div id="lc-admin" class="px-6 py-4 hidden">
+    <div class="flex gap-3 mb-5 flex-wrap">
+      <button onclick="showAdmin('fy')" class="atab on" id="at-fy">📅 Fiscal Years</button>
+      <button onclick="showAdmin('roster')" class="atab" id="at-roster">👥 BD Roster</button>
+      <button onclick="showAdmin('pin')" class="atab" id="at-pin">🔑 Leadership PIN</button>
+    </div>
+
+    <!-- Fiscal Years sub-panel -->
+    <div id="ac-fy">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <div class="orb text-sm font-bold" style="color:#0F5577">FISCAL YEAR MANAGEMENT</div>
+          <p class="text-xs mt-1" style="color:var(--tx3)">Create and manage fiscal years. Each FY has its own BD roster and targets.</p>
+        </div>
+        <button onclick="openCreateFY()" class="btno text-sm px-4 py-2">+ Create New FY</button>
+      </div>
+      <div id="fyList"></div>
+    </div>
+
+    <!-- BD Roster sub-panel -->
+    <div id="ac-roster" class="hidden">
+      <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+        <div>
+          <div class="orb text-sm font-bold" style="color:#0F5577">BD ROSTER MANAGEMENT</div>
+          <p id="rosterFYLabel" class="text-xs mt-1" style="color:var(--tx3)">Managing roster for selected FY</p>
+        </div>
+        <button onclick="openAddBD()" class="btn text-sm px-4 py-2">+ Add BD</button>
+      </div>
+      <div class="card overflow-x-auto" id="bdRosterWrap">
+        <div id="bdRosterTable" class="p-4"></div>
+      </div>
+    </div>
+
+    <!-- Leadership PIN sub-panel -->
+    <div id="ac-pin" class="hidden">
+      <div class="orb text-sm font-bold mb-4" style="color:#0F5577">CHANGE LEADERSHIP PIN</div>
+      <div class="card p-6 max-w-md">
+        <form onsubmit="saveLeadershipPIN(event)" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">Current PIN</label>
+            <input type="password" id="lpCurrent" placeholder="Enter current PIN" required/>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">New PIN</label>
+            <input type="password" id="lpNew" placeholder="Minimum 4 characters" required/>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">Confirm New PIN</label>
+            <input type="password" id="lpConfirm" placeholder="Re-enter new PIN" required/>
+          </div>
+          <p id="lpErr" class="text-red-500 text-xs hidden"></p>
+          <button type="submit" class="btn w-full">Update Leadership PIN ✓</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DEAL MODAL
+══════════════════════════════════════════════════════════════ -->
+<div id="dMod" class="mov hidden">
+  <div class="mod">
+    <div class="flex items-center justify-between mb-6">
+      <div class="orb text-sm font-bold" style="color:#0F5577" id="mTit">ADD NEW DEAL</div>
+      <button onclick="closeD()" style="color:var(--tx3);font-size:22px;background:none;border:none;cursor:pointer">✕</button>
+    </div>
+    <form id="dForm" onsubmit="saveD(event)" class="space-y-4">
+      <input type="hidden" id="dId"/>
+      <div>
+        <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">Client Name <span style="color:#AD332D">*</span></label>
+        <input type="text" id="fCN" placeholder="e.g. Infosys Ltd, TCS, HDFC Bank" required/>
+        <p class="fh">Full name of the client company or organisation.</p>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">Project Type <span style="color:#AD332D">*</span></label>
+        <select id="fPT" required>
+          <option value="">— Select type —</option>
+          <option>Training</option><option>Project / Consulting</option><option>Staffing / Deployment</option><option>Other</option>
+        </select>
+        <p class="fh">Training = ILT or e-learning · Consulting = advisory / fixed-scope · Staffing = resource placement.</p>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">Start Date <span style="color:#AD332D">*</span></label>
+          <input type="date" id="fSD" required/>
+          <p class="fh">Drives the Month column automatically.</p>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">End Date</label>
+          <input type="date" id="fED"/>
+          <p class="fh">Leave blank if ongoing.</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">Revenue (₹) <span style="color:#AD332D">*</span></label>
+          <input type="number" id="fRv" placeholder="e.g. 500000" min="0" step="1" required oninput="calcGp()"/>
+          <p class="fh">Total amount billed to the client in INR.</p>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">Execution Cost (₹) <span style="color:#AD332D">*</span></label>
+          <input type="number" id="fEC" placeholder="e.g. 320000" min="0" step="1" required oninput="calcGp()"/>
+          <p class="fh">All costs: trainers, travel, ops, material, etc.</p>
+        </div>
+      </div>
+      <div id="gpBx" class="hidden rounded-xl p-4 grid grid-cols-3 gap-4" style="background:rgba(15,85,119,.08);border:1px solid rgba(26,149,188,.3)">
+        <div><span class="text-xs font-semibold block mb-1" style="color:var(--tx3)">GROSS PROFIT</span><span id="gpV" class="text-xl font-bold" style="color:#0F5577"></span></div>
+        <div><span class="text-xs font-semibold block mb-1" style="color:var(--tx3)">GP%</span><span id="gpP" class="text-xl font-bold" style="color:#1A95BC"></span></div>
+        <div><span class="text-xs font-semibold block mb-1" style="color:var(--tx3)">HEALTH</span><span id="gpH" class="text-sm font-bold"></span></div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">Status</label>
+          <select id="fSt"><option value="Active">Active</option><option value="Completed">Completed</option><option value="Pipeline">Pipeline</option></select>
+          <p class="fh">Active = in progress · Pipeline = not started · Completed = closed.</p>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">Remarks</label>
+          <input type="text" id="fRm" placeholder="Optional notes"/>
+          <p class="fh">Deal context, follow-ups, or any notes.</p>
+        </div>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn flex-1 py-3">Save Deal ✓</button>
+        <button type="button" onclick="closeD()" class="flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer" style="border:2px solid var(--bd);background:var(--sf);color:var(--tx2)">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ADD / EDIT BD MODAL
+══════════════════════════════════════════════════════════════ -->
+<div id="bdMod" class="mov hidden">
+  <div class="mod">
+    <div class="flex items-center justify-between mb-6">
+      <div class="orb text-sm font-bold" style="color:#0F5577" id="bdModTitle">ADD NEW BD</div>
+      <button onclick="closeBDMod()" style="color:var(--tx3);font-size:22px;background:none;border:none;cursor:pointer">✕</button>
+    </div>
+    <form id="bdForm" onsubmit="saveBDMod(event)" class="space-y-4">
+      <input type="hidden" id="bdEditOrig"/>
+      <div>
+        <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">BD Name <span style="color:#AD332D">*</span></label>
+        <input type="text" id="bdNameInput" placeholder="e.g. Ravi, Priya, Aman" required/>
+        <p class="fh" id="bdNameHint">Name as it will appear in the dashboard.</p>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">Annual Revenue Target (₹) <span style="color:#AD332D">*</span></label>
+        <input type="number" id="bdTargetInput" placeholder="e.g. 10000000" min="0" step="1" required/>
+        <p class="fh">Annual revenue target for this fiscal year in INR. Default ₹1 Crore.</p>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">PIN <span id="bdPinStar" style="color:#AD332D">*</span></label>
+        <input type="password" id="bdPINInput" placeholder="Minimum 4 characters"/>
+        <p class="fh" id="bdPINHint">Required for new BD.</p>
+      </div>
+      <div id="bdPINConfirmDiv">
+        <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">Confirm PIN <span id="bdPinCStar" style="color:#AD332D">*</span></label>
+        <input type="password" id="bdPINConfirm" placeholder="Re-enter PIN"/>
+      </div>
+      <p id="bdFormErr" class="text-red-500 text-xs hidden"></p>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn flex-1 py-3">Save BD ✓</button>
+        <button type="button" onclick="closeBDMod()" class="flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer" style="border:2px solid var(--bd);background:var(--sf);color:var(--tx2)">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CREATE FISCAL YEAR MODAL
+══════════════════════════════════════════════════════════════ -->
+<div id="fyMod" class="mov hidden">
+  <div class="mod">
+    <div class="flex items-center justify-between mb-6">
+      <div class="orb text-sm font-bold" style="color:#0F5577">CREATE NEW FISCAL YEAR</div>
+      <button onclick="closeFYMod()" style="color:var(--tx3);font-size:22px;background:none;border:none;cursor:pointer">✕</button>
+    </div>
+    <form onsubmit="createFY(event)" class="space-y-4">
+      <div>
+        <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">FY Start Year <span style="color:#AD332D">*</span></label>
+        <input type="number" id="fyStartYear" placeholder="e.g. 2026" min="2024" max="2040" required/>
+        <p class="fh">Enter the starting calendar year. E.g., enter 2026 to create FY 2026-27 (Apr 2026 – Mar 2027).</p>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1" style="color:var(--tx2)">Copy BD Roster From</label>
+        <select id="fyCopyFrom"></select>
+        <p class="fh">Copy BD names, PINs, and targets from an existing FY as a starting point — or start fresh and add BDs manually.</p>
+      </div>
+      <div class="tip">
+        <p class="text-xs" style="color:var(--tx2)">💡 <strong>Tip:</strong> After creating the FY, go to the <strong>BD Roster</strong> tab to add new BDs, update targets, or reset PINs for the new year.</p>
+      </div>
+      <p id="fyFormErr" class="text-red-500 text-xs hidden"></p>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn flex-1 py-3">Create Fiscal Year ✓</button>
+        <button type="button" onclick="closeFYMod()" class="flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer" style="border:2px solid var(--bd);background:var(--sf);color:var(--tx2)">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="tst" class="toast hidden"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// SEED DATA (FY 2025-26)
+// ════════════════════════════════════════════════════════════
+const SEED_BDS = [
+  {name:'Arnab',   pin:'d360c1fbd916496f6f58be4a717ce642195a5a5a4da26a353d446f736f6a1b02', target:10000000},
+  {name:'Anand',   pin:'cf8106179c5fd009a4876785e0b8079475602ded52689bb1b7abbaba9ce1e4bb', target:10000000},
+  {name:'Sayed',   pin:'6fe493c941b6d3897f599cbd24912ceb173a22ecc049dbd262f5da5c6055bdc6', target:10000000},
+  {name:'Utkarsh', pin:'8da896372027b0c96328c62e3183c7eb1649e5e0e9f21791eb1c64eba206e29e', target:10000000},
+  {name:'Vikash',  pin:'7d2e4170c9a0f70c0dd86a8a683044d0b1a1e1ba37a585a4a5fe9011adb0b1c4', target:10000000},
+  {name:'Aditya',  pin:'25bba6270a7473ca02695f290b7c11cdce45a0443c0125dab69b30873218da7d', target:10000000},
+  {name:'Nitin',   pin:'bf5750fcf956a0cad4cc0e27bdb5cdcb29aefc296efdef47cc15648ec8cc909d', target:10000000},
+  {name:'Amit',    pin:'3631dc6bc817e9907fbc21316a81d2aa998327bde37900e774a45b6f353d9c73', target:10000000},
+  {name:'Himali',  pin:'3f6fe23c991aa42ee5943e22a0801eab4fa3b018d9e719e113cea24d4ea57204', target:10000000},
+  {name:'Gaurav',  pin:'45e9f120a5f9c719408935ff565b920a39b63471fdaff0b5cd5a3119ba02955e', target:10000000},
+  {name:'A',       pin:'58dfaa852c58f3b7e078b3f4554f1b7681b7e56bc53484ef5286fb81e5998d7a', target:10000000},
+  {name:'Satish',  pin:'125e845e9b16ad8351972806d701ed13b3fdac462236df23b1b587d13158f9cc', target:10000000},
+  {name:'Jofin',   pin:'392f39e89859f34e2d019053db9cfc81e693507eb3f0792ef9ae4f9a3c0f34b4', target:10000000},
+];
+const SEED_LPIN = '545ed917648dbfcbbb5b2a51a5bb0f7ac505b3d751e86be4a6c89e3b430396fb';
+const CFG_PFX   = 'vbd_cfg_';
+const LPIN_KEY  = 'vbd_lpin';
+
+// ════════════════════════════════════════════════════════════
+// CONFIG MANAGEMENT
+// ════════════════════════════════════════════════════════════
+function getCfg(fy){return JSON.parse(localStorage.getItem(CFG_PFX+fy)||'null');}
+function setCfg(fy,c){localStorage.setItem(CFG_PFX+fy,JSON.stringify(c));}
+function getLPIN(){return localStorage.getItem(LPIN_KEY)||SEED_LPIN;}
+function setLPIN(h){localStorage.setItem(LPIN_KEY,h);}
+function getAllFYs(){
+  const r=[];
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(CFG_PFX)){const c=JSON.parse(localStorage.getItem(k)||'null');if(c)r.push(c);}}
+  return r.sort((a,b)=>a.fyCode.localeCompare(b.fyCode));
+}
+function fyLbl(fyCode){const s=fyCode.slice(2,4),e=fyCode.slice(4,6);return'FY 20'+s+'-'+e;}
+function fyCodeFromYear(y){return'fy'+String(y).slice(2)+String(y+1).slice(2);}
+function getFYMonths(fyCode){
+  const yr=parseInt('20'+fyCode.slice(2,4));
+  return['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'].map((m,i)=>m+'-'+String(i<9?yr:yr+1).slice(2));
+}
+function bdDisplay(name){return name==='A'?'BD – A':name;}
+
+function initConfig(){
+  if(!getCfg('fy2526')){
+    setCfg('fy2526',{fyCode:'fy2526',fyLabel:'FY 2025-26',bds:SEED_BDS.map(b=>({...b}))});
+    // Migrate old-format keys (vbd_name → vbd_fy2526_name)
+    SEED_BDS.forEach(bd=>{
+      const ok='vbd_'+bd.name.toLowerCase(),nk='vbd_fy2526_'+bd.name.toLowerCase();
+      if(localStorage.getItem(ok)!==null&&localStorage.getItem(nk)===null)
+        localStorage.setItem(nk,localStorage.getItem(ok));
+    });
+  }
+  if(!localStorage.getItem(LPIN_KEY))localStorage.setItem(LPIN_KEY,SEED_LPIN);
+}
+
+// ════════════════════════════════════════════════════════════
+// DATA ACCESS (keyed by FY)
+// ════════════════════════════════════════════════════════════
+const sk  =(b,fy)=>'vbd_'+fy+'_'+b.toLowerCase();
+const gD  =(b,fy)=>JSON.parse(localStorage.getItem(sk(b,fy))||'[]');
+const sD  =(b,d,fy)=>localStorage.setItem(sk(b,fy),JSON.stringify(d));
+
+// ════════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════════
+const fmt  =n=>'₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:0});
+const pct  =v=>((v||0)*100).toFixed(1)+'%';
+const mfd  =d=>{if(!d)return'';const dt=new Date(d);return dt.toLocaleString('en-GB',{month:'short'})+'-'+String(dt.getFullYear()).slice(2);};
+const fyd  =d=>{if(!d)return'';const dt=new Date(d);const m=dt.getMonth()+1,y=dt.getFullYear();return m>=4?'FY '+y+'-'+String(y+1).slice(2):'FY '+(y-1)+'-'+String(y).slice(2);};
+const gpc  =v=>v>=0.4?'gg':v>=0.2?'gy':'gr';
+const sbg  =s=>({Active:'<span class="sa">Active</span>',Completed:'<span class="sc">Completed</span>',Pipeline:'<span class="sp">Pipeline</span>'}[s]||'<span class="sp">—</span>');
+const uid  =()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
+const VC   =['#0F5577','#1A95BC','#AD332D','#F69320','#22c55e','#a855f7','#06b6d4','#f97316','#14b8a6','#8b5cf6','#ec4899','#84cc16','#6366f1'];
+
+function toast(m){const t=document.getElementById('tst');t.textContent=m;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),2800);}
+
+// ════════════════════════════════════════════════════════════
+// QUOTES
+// ════════════════════════════════════════════════════════════
+const QS=[
+  {q:"You have the right to work, but never to the fruit of your work.",a:"Lord Krishna · Bhagavad Gita 2.47"},
+  {q:"Let right deeds be your motive, not the fruit which comes from them.",a:"Lord Krishna · Bhagavad Gita"},
+  {q:"A person's mind is their best friend, and also their worst enemy.",a:"Lord Krishna · Bhagavad Gita 6.6"},
+  {q:"Reshape yourself through the power of your will.",a:"Lord Krishna · Bhagavad Gita 6.5"},
+  {q:"When meditation is mastered, the mind is unwavering like the flame of a lamp in a windless place.",a:"Lord Krishna · Bhagavad Gita 6.19"},
+  {q:"Fear not what is not real. What is real always was and cannot be destroyed.",a:"Lord Krishna · Bhagavad Gita 2.16"},
+  {q:"The wise grieve neither for the living nor for the dead.",a:"Lord Krishna · Bhagavad Gita 2.11"},
+  {q:"Dharma protects those who protect it.",a:"Mahabharata · Vana Parva"},
+  {q:"Before you start some work, always ask yourself — Why am I doing it, what might the results be, and will I be successful?",a:"Chanakya · Arthashastra"},
+  {q:"Education is the best friend. An educated person is respected everywhere.",a:"Chanakya · Niti Shastra"},
+  {q:"Once you start working on something, don't be afraid of failure.",a:"Chanakya · Niti Shastra"},
+  {q:"A man is great by his deeds, not by his birth.",a:"Chanakya · Niti Shastra"},
+  {q:"The biggest guru-mantra is: never share your secrets with anybody.",a:"Chanakya · Niti Shastra"},
+  {q:"We are what we repeatedly do. Excellence, then, is not an act, but a habit.",a:"Aristotle"},
+  {q:"Knowing yourself is the beginning of all wisdom.",a:"Aristotle"},
+  {q:"Pleasure in the job puts perfection in the work.",a:"Aristotle"},
+  {q:"Excellence is never an accident. It is the result of high intention, sincere effort, and intelligent execution.",a:"Aristotle"},
+  {q:"You have power over your mind, not outside events. Realize this, and you will find strength.",a:"Marcus Aurelius · Meditations"},
+  {q:"The impediment to action advances action. What stands in the way becomes the way.",a:"Marcus Aurelius · Meditations"},
+  {q:"Very little is needed to make a happy life; it is all within yourself, in your way of thinking.",a:"Marcus Aurelius · Meditations"},
+  {q:"Waste no more time arguing about what a good man should be. Be one.",a:"Marcus Aurelius · Meditations"},
+  {q:"It does not matter how slowly you go as long as you do not stop.",a:"Confucius"},
+  {q:"The man who moves a mountain begins by carrying away small stones.",a:"Confucius"},
+  {q:"Our greatest glory is not in never falling, but in rising every time we fall.",a:"Confucius"},
+  {q:"In the midst of chaos, there is also opportunity.",a:"Sun Tzu · The Art of War"},
+  {q:"The supreme art of war is to subdue the enemy without fighting.",a:"Sun Tzu · The Art of War"},
+  {q:"Opportunities multiply as they are seized.",a:"Sun Tzu · The Art of War"},
+  {q:"Plan for what is difficult while it is easy; do what is great while it is small.",a:"Sun Tzu · The Art of War"},
+  {q:"Luck is what happens when preparation meets opportunity.",a:"Seneca"},
+  {q:"We suffer more often in imagination than in reality.",a:"Seneca · Letters to Lucilius"},
+  {q:"A gem cannot be polished without friction, nor a man perfected without trials.",a:"Seneca"},
+  {q:"Yesterday I was clever, so I wanted to change the world. Today I am wise, so I am changing myself.",a:"Rumi"},
+  {q:"What you seek is seeking you.",a:"Rumi"},
+  {q:"You were born with wings. Why prefer to crawl through life?",a:"Rumi"},
+  {q:"Arise, awake, and stop not till the goal is reached.",a:"Swami Vivekananda"},
+  {q:"Take up one idea. Make that one idea your life — think of it, dream of it, live on that idea.",a:"Swami Vivekananda"},
+  {q:"The greatest sin is to think yourself weak.",a:"Swami Vivekananda"},
+  {q:"Strength does not come from physical capacity. It comes from an indomitable will.",a:"Mahatma Gandhi"},
+  {q:"Be the change you wish to see in the world.",a:"Mahatma Gandhi"},
+  {q:"First they ignore you, then they laugh at you, then they fight you, then you win.",a:"Mahatma Gandhi"},
+  {q:"The only way to do great work is to love what you do.",a:"Steve Jobs"},
+  {q:"Innovation distinguishes between a leader and a follower.",a:"Steve Jobs"},
+  {q:"Success is not final, failure is not fatal: it is the courage to continue that counts.",a:"Winston Churchill"},
+  {q:"Whether you think you can or you think you can't, you're right.",a:"Henry Ford"},
+  {q:"It always seems impossible until it's done.",a:"Nelson Mandela"},
+  {q:"Do not wait to strike till the iron is hot; make it hot by striking.",a:"W.B. Yeats"},
+  {q:"Difficulties in life are intended to make us better, not bitter.",a:"Dan Reeves"},
+];
+
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+let cu=null,cuFY=null,cuTarget=10000000,ldFYCode=null,charts={};
+
+// ════════════════════════════════════════════════════════════
+// THEME & INIT
+// ════════════════════════════════════════════════════════════
+function toggleTheme(){
+  const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  localStorage.setItem('vt',t);
+}
+(()=>{
+  document.documentElement.setAttribute('data-theme',localStorage.getItem('vt')||'light');
+  const q=QS[Math.floor(Date.now()/864e5)%QS.length];
+  document.getElementById('qT').textContent='"'+q.q+'"';
+  document.getElementById('qA').textContent='— '+q.a;
+  initConfig();
+  populateLoginFYSelect();
+})();
+
+// ════════════════════════════════════════════════════════════
+// LOGIN
+// ════════════════════════════════════════════════════════════
+function populateLoginFYSelect(){
+  const fys=getAllFYs();
+  const sel=document.getElementById('lFY');
+  sel.innerHTML=fys.map(f=>`<option value="${f.fyCode}">${f.fyLabel}</option>`).join('');
+  if(fys.length){sel.value=fys[fys.length-1].fyCode;onFYSel();}
+}
+
+function onFYSel(){
+  const fy=document.getElementById('lFY').value;
+  populateBDSelect(fy);
+  document.getElementById('lName').value='';
+  ['wMsg','pSec','lBtn'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  document.getElementById('lErr').classList.add('hidden');
+}
+
+function populateBDSelect(fyCode){
+  const cfg=getCfg(fyCode);
+  const bds=cfg?cfg.bds:[];
+  const sel=document.getElementById('lName');
+  sel.innerHTML='<option value="">— Select your name —</option>'+
+    '<option value="leadership">👑 Leadership View</option>'+
+    (bds.length?'<optgroup label="Business Development Team">'+
+      bds.map(bd=>`<option value="${bd.name}">${bdDisplay(bd.name)}</option>`).join('')+
+    '</optgroup>':'');
+}
+
+function onSel(){
+  const n=document.getElementById('lName').value;
+  document.getElementById('lErr').classList.add('hidden');
+  if(!n){['wMsg','pSec','lBtn'].forEach(id=>document.getElementById(id).classList.add('hidden'));return;}
+  ['wMsg','pSec','lBtn'].forEach(id=>document.getElementById(id).classList.remove('hidden'));
+  document.getElementById('lPin').value='';
+  if(n==='leadership'){
+    document.getElementById('wGr').textContent='👑 Welcome, Leadership!';
+    document.getElementById('wIn').innerHTML='<p>You have access to the <strong>consolidated view</strong> of all BDs — KPIs, BD-wise performance, monthly trend, top clients, and the <strong>Admin panel</strong> to manage BDs and fiscal years year on year.</p><p class="mt-1" style="color:#AD332D;font-weight:600">Enter your Leadership PIN to continue.</p>';
+  } else {
+    const dn=bdDisplay(n);
+    document.getElementById('wGr').textContent='👋 Welcome, '+dn+'!';
+    document.getElementById('wIn').innerHTML='<p>Your <strong>private dashboard</strong> — only you see your data.</p><p class="mt-1"><strong>What to fill:</strong></p><p>• <strong>Client Name</strong> — company you are billing</p><p>• <strong>Project Type</strong> — Training / Consulting / Staffing / Other</p><p>• <strong>Start & End Date</strong> — drives Month column automatically</p><p>• <strong>Revenue</strong> — total billed to client (₹)</p><p>• <strong>Execution Cost</strong> — your total delivery cost (₹)</p><p>• <strong>GP & GP%</strong> — calculated automatically 🟢≥40% 🟡20–40% 🔴&lt;20%</p><p class="mt-1" style="color:#AD332D;font-weight:600">Enter your PIN to continue.</p>';
+  }
+}
+
+async function sha256(m){
+  const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(m));
+  return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+async function doLogin(){
+  const n=document.getElementById('lName').value,p=document.getElementById('lPin').value;
+  const fy=document.getElementById('lFY').value;
+  const err=document.getElementById('lErr');err.classList.add('hidden');
+  if(!n||!p)return;
+  const h=await sha256(p);
+  let valid=false;
+  if(n==='leadership'){
+    valid=(h===getLPIN());
+  } else {
+    const cfg=getCfg(fy);
+    const bd=cfg&&cfg.bds.find(b=>b.name===n);
+    valid=!!(bd&&bd.pin&&h===bd.pin);
+  }
+  if(!valid){err.classList.remove('hidden');document.getElementById('lPin').value='';return;}
+  cu=n;cuFY=fy;
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('lPin').value='';
+  if(n==='leadership'){
+    ldFYCode=fy;
+    initLd();
+    document.getElementById('ldApp').classList.remove('hidden');
+  } else {
+    initBd();
+    document.getElementById('bdApp').classList.remove('hidden');
+  }
+}
+
+function logout(){
+  cu=null;cuFY=null;
+  ['bdApp','ldApp'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('lName').value='';
+  ['wMsg','pSec','lBtn'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  Object.values(charts).forEach(c=>c&&c.destroy());charts={};
+  populateLoginFYSelect();
+}
+
+// ════════════════════════════════════════════════════════════
+// BD DASHBOARD
+// ════════════════════════════════════════════════════════════
+function initBd(){
+  const cfg=getCfg(cuFY);
+  const bd=cfg&&cfg.bds.find(b=>b.name===cu);
+  cuTarget=bd?bd.target:10000000;
+  document.getElementById('bdHN').textContent=bdDisplay(cu);
+  document.getElementById('bdFYLabel').textContent=(cfg?cfg.fyLabel:fyLbl(cuFY))+' · Confidential';
+  document.getElementById('bdChTitle').textContent='MY MONTHLY REVENUE & GP — '+(cfg?cfg.fyLabel:fyLbl(cuFY));
+  rKpi();rTbl();showT('d');
+}
+
+function rKpi(){
+  const d=gD(cu,cuFY),rev=d.reduce((s,x)=>s+(+x.rv||0),0),gp=d.reduce((s,x)=>s+(+x.gp||0),0),gpp=rev?gp/rev:0,att=cuTarget?rev/cuTarget:0;
+  document.getElementById('bKpi').innerHTML=`
+    <div class="kpi kb"><div class="orb text-xs font-semibold mb-1" style="color:#0F5577">TOTAL REVENUE</div><div class="text-2xl font-bold">${fmt(rev)}</div><div class="text-xs mt-1" style="color:var(--tx3)">Target: ${fmt(cuTarget)}</div></div>
+    <div class="kpi kg"><div class="orb text-xs font-semibold mb-1 text-green-700">TOTAL GP</div><div class="text-2xl font-bold text-green-600">${fmt(gp)}</div><div class="text-xs mt-1" style="color:var(--tx3)">Gross Profit</div></div>
+    <div class="kpi ko"><div class="orb text-xs font-semibold mb-1" style="color:#c2410c">GP%</div><div class="text-2xl font-bold text-orange-500">${pct(gpp)}</div><div class="text-xs mt-1" style="color:var(--tx3)">Overall margin</div></div>
+    <div class="kpi kc"><div class="orb text-xs font-semibold mb-1" style="color:#1A95BC">ATTAINMENT</div><div class="text-2xl font-bold" style="color:#1A95BC">${pct(att)}</div><div class="text-xs mt-1" style="color:var(--tx3)">vs Annual Target</div></div>`;
+}
+
+function rTbl(){
+  const d=gD(cu,cuFY);
+  document.getElementById('bTB').innerHTML=d.length?d.map((x,i)=>`<tr>
+    <td class="text-center" style="color:var(--tx3)">${i+1}</td>
+    <td class="font-semibold" style="color:#0F5577">${x.cn}</td><td style="color:var(--tx2)">${x.pt}</td>
+    <td style="color:var(--tx2)">${x.sd||'—'}</td><td style="color:var(--tx2)">${x.ed||'—'}</td>
+    <td style="color:var(--tx2)">${x.mo||'—'}</td>
+    <td class="text-right font-mono">${fmt(x.rv)}</td><td class="text-right font-mono">${fmt(x.ec)}</td>
+    <td class="text-right font-mono">${fmt(x.gp)}</td>
+    <td class="text-center"><span class="${gpc(x.gpp)}">${pct(x.gpp)}</span></td>
+    <td class="text-center">${sbg(x.st)}</td>
+    <td class="text-xs" style="color:var(--tx3)">${x.rm||'—'}</td>
+    <td class="text-center"><button class="bsm mr-1" onclick="openD('${x.id}')">✏️</button><button class="bdel" onclick="delD('${x.id}')">🗑</button></td></tr>`).join('') :
+    '<tr><td colspan="13" class="text-center py-12" style="color:var(--tx3)">No deals yet — click <strong>+ Add Deal</strong> to begin.</td></tr>';
+}
+
+function showT(t){
+  ['d','t'].forEach(x=>{document.getElementById('tc-'+x).classList.toggle('hidden',x!==t);document.getElementById('tb-'+x).classList.toggle('on',x===t);});
+  if(t==='t')rBdCh();
+}
+
+function rBdCh(){
+  const FYM=getFYMonths(cuFY),d=gD(cu,cuFY),rm={},gm={};
+  FYM.forEach(m=>{rm[m]=0;gm[m]=0;});
+  d.forEach(x=>{if(x.mo&&rm.hasOwnProperty(x.mo)){rm[x.mo]+=(+x.rv||0);gm[x.mo]+=(+x.gp||0);}});
+  const ctx=document.getElementById('bCh').getContext('2d');
+  if(charts.b)charts.b.destroy();
+  charts.b=new Chart(ctx,{type:'line',data:{labels:FYM,datasets:[
+    {label:'Revenue (₹)',data:FYM.map(m=>rm[m]),borderColor:'#0F5577',backgroundColor:'rgba(15,85,119,.1)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:'#0F5577'},
+    {label:'GP (₹)',data:FYM.map(m=>gm[m]),borderColor:'#F69320',backgroundColor:'rgba(246,147,32,.08)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:'#F69320'}
+  ]},options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'₹'+v.toLocaleString('en-IN')}}}}});
+}
+
+// ════════════════════════════════════════════════════════════
+// DEAL MODAL
+// ════════════════════════════════════════════════════════════
+function openD(id=null){
+  document.getElementById('dMod').classList.remove('hidden');
+  document.getElementById('dId').value=id||'';
+  document.getElementById('mTit').textContent=id?'EDIT DEAL':'ADD NEW DEAL';
+  if(id){
+    const x=gD(cu,cuFY).find(d=>d.id===id);
+    if(x){document.getElementById('fCN').value=x.cn;document.getElementById('fPT').value=x.pt;document.getElementById('fSD').value=x.sd;document.getElementById('fED').value=x.ed||'';document.getElementById('fRv').value=x.rv;document.getElementById('fEC').value=x.ec;document.getElementById('fSt').value=x.st||'Active';document.getElementById('fRm').value=x.rm||'';calcGp();}
+  } else {document.getElementById('dForm').reset();document.getElementById('gpBx').classList.add('hidden');}
+}
+function closeD(){document.getElementById('dMod').classList.add('hidden');}
+document.getElementById('dMod').addEventListener('click',e=>{if(e.target===document.getElementById('dMod'))closeD();});
+
+function calcGp(){
+  const r=+(document.getElementById('fRv').value||0),c=+(document.getElementById('fEC').value||0);
+  if(r){const g=r-c,p=g/r;document.getElementById('gpV').textContent=fmt(g);document.getElementById('gpP').textContent=pct(p);document.getElementById('gpH').textContent=p>=0.4?'🟢 Healthy':p>=0.2?'🟡 Moderate':'🔴 Low';document.getElementById('gpBx').classList.remove('hidden');}
+  else document.getElementById('gpBx').classList.add('hidden');
+}
+
+function saveD(e){
+  e.preventDefault();
+  const r=+(document.getElementById('fRv').value||0),c=+(document.getElementById('fEC').value||0),g=r-c,sd=document.getElementById('fSD').value;
+  const deal={id:document.getElementById('dId').value||uid(),cn:document.getElementById('fCN').value.trim(),pt:document.getElementById('fPT').value,sd,ed:document.getElementById('fED').value,rv:r,ec:c,gp:g,gpp:r?g/r:0,st:document.getElementById('fSt').value,rm:document.getElementById('fRm').value.trim(),mo:mfd(sd),fy:fyd(sd)};
+  let d=gD(cu,cuFY);const i=d.findIndex(x=>x.id===deal.id);
+  if(i>=0)d[i]=deal;else d.push(deal);
+  sD(cu,d,cuFY);closeD();rKpi();rTbl();toast(i>=0?'Deal updated ✓':'Deal added ✓');
+}
+function delD(id){if(!confirm('Delete this deal permanently?'))return;sD(cu,gD(cu,cuFY).filter(d=>d.id!==id),cuFY);rKpi();rTbl();toast('Deal deleted');}
+
+// ════════════════════════════════════════════════════════════
+// LEADERSHIP — FY-AWARE DATA
+// ════════════════════════════════════════════════════════════
+const aD=()=>{const cfg=getCfg(ldFYCode);if(!cfg)return[];return cfg.bds.flatMap(bd=>gD(bd.name,ldFYCode).map(d=>({...d,b:bd.name})));};
+const bds=()=>{
+  const cfg=getCfg(ldFYCode);if(!cfg)return[];
+  const FYM=getFYMonths(ldFYCode);
+  return cfg.bds.map(bd=>{
+    const d=gD(bd.name,ldFYCode),rev=d.reduce((s,x)=>s+(+x.rv||0),0),gp=d.reduce((s,x)=>s+(+x.gp||0),0);
+    const mon={};FYM.forEach(m=>mon[m]=0);d.forEach(x=>{if(x.mo&&mon.hasOwnProperty(x.mo))mon[x.mo]+=(+x.rv||0);});
+    const tgt=bd.target||10000000;
+    return{b:bd.name,rev,gp,gpp:rev?gp/rev:0,tgt,att:tgt?rev/tgt:0,mon};
+  });
+};
+
+// ════════════════════════════════════════════════════════════
+// LEADERSHIP DASHBOARD
+// ════════════════════════════════════════════════════════════
+function initLd(){
+  populateLdFYSelect();
+  rLKpi();showL('ov');
+}
+
+function populateLdFYSelect(){
+  const fys=getAllFYs();
+  const sel=document.getElementById('ldFY');
+  sel.innerHTML=fys.map(f=>`<option value="${f.fyCode}"${f.fyCode===ldFYCode?' selected':''}>${f.fyLabel}</option>`).join('');
+}
+
+function onLdFYChange(){
+  ldFYCode=document.getElementById('ldFY').value;
+  rLKpi();
+  // Refresh currently active tab
+  const active=['ov','bd','tr','cl'].find(x=>!document.getElementById('lc-'+x).classList.contains('hidden'));
+  if(active)showL(active);
+  else if(!document.getElementById('lc-admin').classList.contains('hidden'))renderBDRoster();
+}
+
+function rLKpi(){
+  const s=bds(),tr=s.reduce((a,x)=>a+x.rev,0),tg=s.reduce((a,x)=>a+x.gp,0),gpp=tr?tg/tr:0;
+  const totalTgt=s.reduce((a,x)=>a+x.tgt,0),top=[...s].sort((a,b)=>b.rev-a.rev)[0];
+  const cfg=getCfg(ldFYCode),fyL=cfg?cfg.fyLabel:fyLbl(ldFYCode||'fy2526');
+  document.getElementById('lKpi').innerHTML=`
+    <div class="kpi kb"><div class="orb text-xs font-semibold mb-1" style="color:#0F5577">TOTAL REVENUE</div><div class="text-xl font-bold">${fmt(tr)}</div><div class="text-xs mt-1" style="color:var(--tx3)">${fyL}</div></div>
+    <div class="kpi kg"><div class="orb text-xs font-semibold mb-1 text-green-700">TOTAL GP</div><div class="text-xl font-bold text-green-600">${fmt(tg)}</div><div class="text-xs mt-1" style="color:var(--tx3)">Gross Profit</div></div>
+    <div class="kpi ko"><div class="orb text-xs font-semibold mb-1" style="color:#c2410c">OVERALL GP%</div><div class="text-xl font-bold text-orange-500">${pct(gpp)}</div><div class="text-xs mt-1" style="color:var(--tx3)">Blended margin</div></div>
+    <div class="kpi kc"><div class="orb text-xs font-semibold mb-1" style="color:#1A95BC">TEAM ATTAINMENT</div><div class="text-xl font-bold" style="color:#1A95BC">${pct(totalTgt?tr/totalTgt:0)}</div><div class="text-xs mt-1" style="color:var(--tx3)">vs Total Target</div></div>
+    <div class="kpi kr"><div class="orb text-xs font-semibold mb-1" style="color:#AD332D">TOP BD</div><div class="text-xl font-bold" style="color:#AD332D">${top&&top.rev?bdDisplay(top.b):'—'}</div><div class="text-xs mt-1" style="color:var(--tx3)">${top&&top.rev?fmt(top.rev):'No data'}</div></div>`;
+}
+
+function rLTbl(){
+  document.getElementById('lBdB').innerHTML=bds().map((x,i)=>{
+    const vs=x.rev-x.tgt,pf=Math.min(100,Math.round(x.att*100)),st=x.att>=0.75?'✅ On Track':x.att>=0.5?'⚠️ Needs Attention':'🔴 Below Target';
+    return`<tr><td class="text-center" style="color:var(--tx3)">${i+1}</td><td class="font-bold" style="color:#0F5577">${bdDisplay(x.b)}</td><td class="text-right font-mono">${fmt(x.tgt)}</td><td class="text-right font-mono">${fmt(x.rev)}</td><td class="text-right font-mono">${fmt(x.gp)}</td><td class="text-center"><span class="${gpc(x.gpp)}">${pct(x.gpp)}</span></td><td class="text-center">${pct(x.att)}<span class="ab"><span class="af" style="width:${pf}%;background:${pf>=75?'#22c55e':pf>=50?'#F69320':'#AD332D'}"></span></span></td><td class="text-right font-mono ${vs>=0?'text-green-600':'text-red-500'}">${vs>=0?'+':''}${fmt(vs)}</td><td class="text-center">${st}</td></tr>`;
+  }).join('')||'<tr><td colspan="9" class="text-center py-8" style="color:var(--tx3)">No BDs configured for this FY. Go to ⚙️ Admin to set up BD roster.</td></tr>';
+}
+
+function showL(t){
+  ['ov','bd','tr','cl','admin'].forEach(x=>{
+    document.getElementById('lc-'+x).classList.toggle('hidden',x!==t);
+    document.getElementById('lt-'+x).classList.toggle('on',x===t);
+  });
+  if(t==='ov')rLCh();
+  else if(t==='bd')rLTbl();
+  else if(t==='tr')rLTr();
+  else if(t==='cl')rCl();
+  else if(t==='admin'){showAdmin('fy');}
+}
+
+function rLCh(){
+  const s=bds(),lb=s.map(x=>bdDisplay(x.b));
+  const c1=document.getElementById('lRv').getContext('2d');if(charts.lr)charts.lr.destroy();
+  charts.lr=new Chart(c1,{type:'bar',data:{labels:lb,datasets:[{label:'Revenue (₹)',data:s.map(x=>x.rev),backgroundColor:VC}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'₹'+v.toLocaleString('en-IN')}}}}});
+  const c2=document.getElementById('lGp').getContext('2d');if(charts.lg)charts.lg.destroy();
+  charts.lg=new Chart(c2,{type:'bar',data:{labels:lb,datasets:[{label:'GP%',data:s.map(x=>+(x.gpp*100).toFixed(1)),backgroundColor:s.map(x=>x.gpp>=0.4?'#22c55e':x.gpp>=0.2?'#F69320':'#AD332D')}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>v+'%'}}}}});
+}
+
+function rLTr(){
+  const FYM=getFYMonths(ldFYCode),s=bds(),team={};
+  FYM.forEach(m=>team[m]=0);s.forEach(x=>FYM.forEach(m=>team[m]+=(x.mon[m]||0)));
+  const cfg=getCfg(ldFYCode);
+  document.getElementById('lTrTitle').textContent='TEAM REVENUE — MONTH ON MONTH — '+(cfg?cfg.fyLabel:fyLbl(ldFYCode));
+  const ctx=document.getElementById('lTr').getContext('2d');if(charts.lt)charts.lt.destroy();
+  charts.lt=new Chart(ctx,{type:'line',data:{labels:FYM,datasets:[{label:'Team Revenue (₹)',data:FYM.map(m=>team[m]),borderColor:'#0F5577',backgroundColor:'rgba(15,85,119,.12)',fill:true,tension:.3,pointRadius:6,pointBackgroundColor:'#F69320'}]},options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'₹'+v.toLocaleString('en-IN')}}}}});
+}
+
+function rCl(){
+  const byC={};aD().forEach(d=>{const k=d.cn;if(!byC[k])byC[k]={name:k,b:d.b,pt:d.pt,rev:0,gp:0};byC[k].rev+=(+d.rv||0);byC[k].gp+=(+d.gp||0);});
+  const s=Object.values(byC).sort((a,b)=>b.rev-a.rev).slice(0,20);
+  document.getElementById('lClB').innerHTML=s.length?s.map((c,i)=>`<tr><td class="text-center" style="color:var(--tx3)">${i+1}</td><td class="font-semibold" style="color:#0F5577">${c.name}</td><td>${bdDisplay(c.b)}</td><td>${c.pt}</td><td class="text-right font-mono">${fmt(c.rev)}</td><td class="text-right font-mono">${fmt(c.gp)}</td><td class="text-center"><span class="${gpc(c.rev?c.gp/c.rev:0)}">${pct(c.rev?c.gp/c.rev:0)}</span></td></tr>`).join('') :
+  '<tr><td colspan="7" class="text-center py-8" style="color:var(--tx3)">No data yet for this FY.</td></tr>';
+}
+
+// ════════════════════════════════════════════════════════════
+// ADMIN PANEL
+// ════════════════════════════════════════════════════════════
+function showAdmin(t){
+  ['fy','roster','pin'].forEach(x=>{
+    document.getElementById('ac-'+x).classList.toggle('hidden',x!==t);
+    document.getElementById('at-'+x).classList.toggle('on',x===t);
+  });
+  if(t==='fy')renderFYList();
+  else if(t==='roster')renderBDRoster();
+}
+
+// — FY Management —
+function renderFYList(){
+  const fys=getAllFYs();
+  if(!fys.length){document.getElementById('fyList').innerHTML='<p class="text-center py-8" style="color:var(--tx3)">No fiscal years found.</p>';return;}
+  document.getElementById('fyList').innerHTML=fys.map(f=>{
+    const isActive=f.fyCode===ldFYCode;
+    const totalTgt=f.bds.reduce((a,b)=>a+(b.target||0),0);
+    return`<div class="admc flex items-start justify-between gap-4">
+      <div>
+        <div class="font-bold text-base" style="color:#0F5577">${f.fyLabel}</div>
+        <div class="text-xs mt-1" style="color:var(--tx3)">${f.bds.length} BD${f.bds.length!==1?'s':''} · Total Target: ${fmt(totalTgt)}</div>
+        <div class="flex gap-2 mt-2 flex-wrap">
+          ${f.bds.slice(0,8).map(b=>`<span class="sa text-xs">${bdDisplay(b.name)}</span>`).join('')}
+          ${f.bds.length>8?`<span class="sp text-xs">+${f.bds.length-8} more</span>`:''}
+        </div>
+      </div>
+      <div class="flex gap-2 flex-shrink-0 items-center flex-wrap justify-end">
+        ${isActive?'<span class="sc">Viewing ✓</span>':`<button class="bsm" onclick="switchLdFY('${f.fyCode}')">View Reports</button>`}
+        <button class="bsm" onclick="showAdmin('roster');document.getElementById('ldFY').value='${f.fyCode}';ldFYCode='${f.fyCode}';renderBDRoster()">Edit Roster</button>
+        ${fys.length>1?`<button class="bdel" onclick="deleteFY('${f.fyCode}')">Delete</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function switchLdFY(fyCode){
+  ldFYCode=fyCode;
+  document.getElementById('ldFY').value=fyCode;
+  rLKpi();
+  renderFYList();
+  toast('Viewing '+fyLbl(fyCode));
+}
+
+function deleteFY(fyCode){
+  if(!confirm(`Delete ${fyLbl(fyCode)}?\n\nThis removes the FY configuration. Deal data stored in this FY is preserved in browser storage but will be inaccessible until the FY is recreated.`))return;
+  localStorage.removeItem(CFG_PFX+fyCode);
+  if(ldFYCode===fyCode){
+    const rem=getAllFYs();
+    ldFYCode=rem.length?rem[rem.length-1].fyCode:null;
+    if(ldFYCode){document.getElementById('ldFY').value=ldFYCode;rLKpi();}
+  }
+  populateLdFYSelect();
+  renderFYList();
+  toast('FY deleted');
+}
+
+// — Create FY Modal —
+function openCreateFY(){
+  const fys=getAllFYs();
+  const sel=document.getElementById('fyCopyFrom');
+  sel.innerHTML='<option value="">— Start Fresh —</option>'+fys.map(f=>`<option value="${f.fyCode}">${f.fyLabel}</option>`).join('');
+  if(fys.length)sel.value=fys[fys.length-1].fyCode;
+  // Suggest next year after latest
+  const latestYear=fys.length?parseInt('20'+fys[fys.length-1].fyCode.slice(2,4)):2025;
+  document.getElementById('fyStartYear').value=latestYear+1;
+  document.getElementById('fyFormErr').classList.add('hidden');
+  document.getElementById('fyMod').classList.remove('hidden');
+}
+function closeFYMod(){document.getElementById('fyMod').classList.add('hidden');}
+document.getElementById('fyMod').addEventListener('click',e=>{if(e.target===document.getElementById('fyMod'))closeFYMod();});
+
+function createFY(e){
+  e.preventDefault();
+  const startYear=parseInt(document.getElementById('fyStartYear').value);
+  const copyFrom=document.getElementById('fyCopyFrom').value;
+  const errEl=document.getElementById('fyFormErr');
+  errEl.classList.add('hidden');
+  if(isNaN(startYear)||startYear<2024||startYear>2040){errEl.textContent='Please enter a valid start year (2024–2040).';errEl.classList.remove('hidden');return;}
+  const fyCode=fyCodeFromYear(startYear);
+  if(getCfg(fyCode)){errEl.textContent=fyLbl(fyCode)+' already exists! Delete it first or choose a different year.';errEl.classList.remove('hidden');return;}
+  let bds=[];
+  if(copyFrom){const src=getCfg(copyFrom);if(src)bds=src.bds.map(b=>({...b}));}
+  const newCfg={fyCode,fyLabel:fyLbl(fyCode),bds};
+  setCfg(fyCode,newCfg);
+  closeFYMod();
+  ldFYCode=fyCode;
+  populateLdFYSelect();
+  rLKpi();
+  renderFYList();
+  toast(fyLbl(fyCode)+' created ✓ — update BD roster in the Roster tab');
+}
+
+// — BD Roster Management —
+function renderBDRoster(){
+  const cfg=getCfg(ldFYCode);
+  document.getElementById('rosterFYLabel').textContent='Managing roster for '+(cfg?cfg.fyLabel:fyLbl(ldFYCode||''));
+  if(!cfg){document.getElementById('bdRosterTable').innerHTML='<p class="text-center py-8" style="color:var(--tx3)">FY config not found.</p>';return;}
+  const bds=cfg.bds;
+  if(!bds.length){
+    document.getElementById('bdRosterTable').innerHTML='<p class="text-center py-8" style="color:var(--tx3)">No BDs configured. Click <strong>+ Add BD</strong> to begin.</p>';
+    return;
+  }
+  document.getElementById('bdRosterTable').innerHTML=`
+    <div class="overflow-x-auto">
+    <table>
+      <thead><tr><th>#</th><th>BD Name</th><th>Annual Target (₹)</th><th>PIN</th><th>Actions</th></tr></thead>
+      <tbody>${bds.map((bd,i)=>`
+        <tr>
+          <td class="text-center" style="color:var(--tx3)">${i+1}</td>
+          <td class="font-bold" style="color:#0F5577">${bdDisplay(bd.name)}</td>
+          <td class="text-right font-mono">${fmt(bd.target||0)}</td>
+          <td class="text-center">${bd.pin?'<span class="sc">Set ✓</span>':'<span class="gr">Not Set</span>'}</td>
+          <td class="text-center">
+            <button class="bsm mr-1" onclick="openEditBD('${bd.name}')">✏️ Edit</button>
+            <button class="bdel" onclick="removeBD('${bd.name}')">🗑 Remove</button>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+    </div>`;
+}
+
+// — Add/Edit BD —
+function openAddBD(){
+  document.getElementById('bdMod').classList.remove('hidden');
+  document.getElementById('bdModTitle').textContent='ADD NEW BD — '+fyLbl(ldFYCode||'');
+  document.getElementById('bdEditOrig').value='';
+  document.getElementById('bdNameInput').value='';
+  document.getElementById('bdNameInput').disabled=false;
+  document.getElementById('bdNameHint').textContent='Name as it will appear in the dashboard.';
+  document.getElementById('bdTargetInput').value='10000000';
+  document.getElementById('bdPINInput').value='';
+  document.getElementById('bdPINConfirm').value='';
+  document.getElementById('bdPinStar').style.display='inline';
+  document.getElementById('bdPinCStar').style.display='inline';
+  document.getElementById('bdPINHint').textContent='Required for new BD.';
+  document.getElementById('bdFormErr').classList.add('hidden');
+}
+
+function openEditBD(name){
+  const cfg=getCfg(ldFYCode);
+  const bd=cfg&&cfg.bds.find(b=>b.name===name);
+  if(!bd)return;
+  document.getElementById('bdMod').classList.remove('hidden');
+  document.getElementById('bdModTitle').textContent='EDIT BD: '+bdDisplay(name);
+  document.getElementById('bdEditOrig').value=name;
+  document.getElementById('bdNameInput').value=bdDisplay(name);
+  document.getElementById('bdNameInput').disabled=true;
+  document.getElementById('bdNameHint').textContent='Name cannot be changed after adding (data is keyed to it).';
+  document.getElementById('bdTargetInput').value=bd.target||10000000;
+  document.getElementById('bdPINInput').value='';
+  document.getElementById('bdPINConfirm').value='';
+  document.getElementById('bdPinStar').style.display='none';
+  document.getElementById('bdPinCStar').style.display='none';
+  document.getElementById('bdPINHint').textContent='Leave blank to keep the existing PIN unchanged.';
+  document.getElementById('bdFormErr').classList.add('hidden');
+}
+
+function closeBDMod(){document.getElementById('bdMod').classList.add('hidden');}
+document.getElementById('bdMod').addEventListener('click',e=>{if(e.target===document.getElementById('bdMod'))closeBDMod();});
+
+async function saveBDMe~(e){
+  e.preventDefault();
+  const origName=document.getElementById('bdEditOrig').value;
+  const isNew=!origName;
+  const name=isNew?document.getElementById('bdNameInput').value.trim():origName;
+  const target=parseInt(document.getElementById('bdTargetInput').value)||10000000;
+  const pin=document.getElementById('bdPINInput').value;
+  const pinConfirm=document.getElementById('bdPINConfirm').value;
+  const errEl=document.getElementById('bdFormErr');
+  errEl.classList.add('hidden');
+  if(!name){errEl.textContent='BD name is required.';errEl.classList.remove('hidden');return;}
+  if(isNew&&!pin){errEl.textContent='PIN is required for new BDs.';errEl.classList.remove('hidden');return;}
+  if(pin&&pin!==pinConfirm){errEl.textContent='PINs do not match.';errEl.classList.remove('hidden');return;}
+  if(pin&&pin.length<4){errEl.textContent='PIN must be at least 4 characters.';errEl.classList.remove('hidden');return;}
+  const cfg=getCfg(ldFYCode);
+  if(!cfg){toast('FY config not found!');return;}
+  if(isNew&&cfg.bds.find(b=>b.name.toLowerCase()===name.toLowerCase())){
+    errEl.textContent='A BD named "'+name+'" already exists in '+cfg.fyLabel+'.';errEl.classList.remove('hidden');return;
+  }
+  if(isNew){
+    const pinHash=pin?await sha256(pin):'';
+    cfg.bds.push({name,pin:pinHash,target});
+  } else {
+    const idx=cfg.bds.findIndex(b=>b.name===origName);
+    if(idx<0){toast('BD not found!');return;}
+    cfg.bds[idx].target=target;
+    if(pin)cfg.bds[idx].pin=await sha256(pin);
+  }
+  setCfg(ldFYCode,cfg);
+  closeBDMod();
+  renderBDRoster();
+  rLKpi();
+  toast(isNew?'BD added ✓':'BD updated ✓');
+}
+
+function removeBD(name){
+  if(!confirm(`Remove ${bdDisplay(name)} from ${fyLbl(ldFYCode)}?\n\nNote: Deal data for this BD is preserved in storage and will return if the BD is added back with the same name.`))return;
+  const cfg=getCfg(ldFYCode);
+  if(!cfg)return;
+  cfg.bds=cfg.bds.filter(b=>b.name!==name);
+  setCfg(ldFYCode,cfg);
+  renderBDRoster();
+  rLKpi();
+  toast(bdDisplay(name)+' removed from roster');
+}
+
+// — Leadership PIN —
+async function saveLeadershipPIN(e){
+  e.preventDefault();
+  const cur=document.getElementById('lpCurrent').value;
+  const nw=document.getElementById('lpNew').value;
+  const conf=document.getElementById('lpConfirm').value;
+  const errEl=document.getElementById('lpErr');
+  errEl.classList.add('hidden');
+  const curHash=await sha256(cur);
+  if(curHash!==getLPIN()){errEl.textContent='Current PIN is incorrect.';errEl.classList.remove('hidden');return;}
+  if(nw!==conf){errEl.textContent='New PINs do not match.';errEl.classList.remove('hidden');return;}
+  if(nw.length<4){errEl.textContent='PIN must be at least 4 characters.';errEl.classList.remove('hidden');return;}
+  setLPIN(await sha256(nw));
+  document.getElementById('lpCurrent').value='';
+  document.getElementById('lpNew').value='';
+  document.getElementById('lpConfirm').value='';
+  toast('Leadership PIN updated ✓');
+}
+</script>
+</body>
+</html>
